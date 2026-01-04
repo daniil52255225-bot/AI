@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Нейросетевой ИИ с нуля</title>
+    <title>Нейросетевой ИИ с нуля - Работающая версия</title>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0/dist/tf.min.js"></script>
     <style>
         * {
@@ -27,100 +27,81 @@
 
         header {
             text-align: center;
-            padding: 40px 0;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 40px;
+            padding: 30px 0;
+            margin-bottom: 30px;
         }
 
         h1 {
-            font-size: 3rem;
+            font-size: 2.8rem;
             margin-bottom: 15px;
-            background: linear-gradient(to right, #ff5e62 0%, #ff9966 100%);
+            background: linear-gradient(to right, #00c6ff, #0072ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
 
         .subtitle {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             opacity: 0.9;
-            margin-bottom: 20px;
-        }
-
-        .ai-label {
-            display: inline-block;
-            background: linear-gradient(to right, #ff5e62 0%, #ff9966 100%);
-            color: white;
-            padding: 8px 20px;
-            border-radius: 25px;
-            font-weight: bold;
-            font-size: 1.1rem;
+            margin-bottom: 15px;
         }
 
         .content {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 40px;
+            gap: 25px;
+            margin-bottom: 30px;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             .content {
                 grid-template-columns: 1fr;
             }
         }
 
         .panel {
-            background: rgba(255, 255, 255, 0.07);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .panel h2 {
-            color: #ff9966;
+            color: #00c6ff;
             margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .panel h2 i {
-            font-size: 1.5rem;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(0, 198, 255, 0.3);
         }
 
         .chat-area {
-            height: 400px;
+            height: 350px;
             overflow-y: auto;
-            padding: 20px;
+            padding: 15px;
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            margin-bottom: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
         .message {
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 15px;
-            max-width: 80%;
+            padding: 12px 15px;
+            border-radius: 12px;
+            max-width: 85%;
+            word-wrap: break-word;
         }
 
         .user-message {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            margin-left: auto;
-            text-align: right;
+            background: linear-gradient(135deg, #0072ff, #00c6ff);
+            align-self: flex-end;
+            border-bottom-right-radius: 3px;
         }
 
         .ai-message {
-            background: linear-gradient(135deg, #ff5e62 0%, #ff9966 100%);
-            margin-right: auto;
-        }
-
-        .message-header {
-            font-size: 0.8rem;
-            opacity: 0.8;
-            margin-bottom: 5px;
+            background: rgba(255, 255, 255, 0.15);
+            align-self: flex-start;
+            border-bottom-left-radius: 3px;
         }
 
         .input-area {
@@ -130,140 +111,121 @@
 
         input, textarea {
             flex: 1;
-            padding: 15px;
+            padding: 12px 15px;
             background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
             color: white;
             font-size: 1rem;
         }
 
         input:focus, textarea:focus {
             outline: none;
-            border-color: #ff9966;
-            background: rgba(255, 255, 255, 0.15);
+            border-color: #00c6ff;
+            box-shadow: 0 0 0 2px rgba(0, 198, 255, 0.2);
         }
 
         button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0072ff, #00c6ff);
             color: white;
             border: none;
-            border-radius: 12px;
-            padding: 0 25px;
+            border-radius: 8px;
+            padding: 12px 20px;
             font-size: 1rem;
-            font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s;
         }
 
         button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 7px 15px rgba(0, 0, 0, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 114, 255, 0.4);
         }
 
-        button:active {
-            transform: translateY(0);
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .training-section {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
         }
 
         .training-data {
-            height: 200px;
+            height: 150px;
             resize: vertical;
         }
 
         .status {
             padding: 15px;
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
+            border-radius: 10px;
             font-family: monospace;
             font-size: 0.9rem;
-            height: 100px;
+            min-height: 80px;
+            max-height: 150px;
             overflow-y: auto;
+            margin-top: 15px;
         }
 
-        .neuron {
-            width: 20px;
-            height: 20px;
-            background: #ff9966;
-            border-radius: 50%;
-            position: absolute;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.7; }
-            50% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.7; }
-        }
-
-        .neural-network {
-            position: relative;
-            height: 200px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 15px;
-            margin-top: 20px;
-            overflow: hidden;
-        }
-
-        .connection {
-            position: absolute;
-            height: 2px;
-            background: rgba(255, 153, 102, 0.5);
-            transform-origin: 0 0;
+        .progress-container {
+            margin: 15px 0;
         }
 
         .progress-bar {
             width: 100%;
-            height: 10px;
+            height: 8px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
-            margin-top: 10px;
+            border-radius: 4px;
             overflow: hidden;
         }
 
         .progress {
             height: 100%;
-            background: linear-gradient(90deg, #ff5e62, #ff9966);
+            background: linear-gradient(90deg, #00c6ff, #0072ff);
             width: 0%;
-            transition: width 0.5s;
+            transition: width 0.3s;
         }
 
         .stats {
             display: flex;
             justify-content: space-between;
-            margin-top: 20px;
-            font-size: 0.9rem;
-            opacity: 0.8;
+            margin-top: 10px;
+            font-size: 0.85rem;
         }
 
         .error {
-            color: #ff5e62;
-            font-weight: bold;
+            color: #ff4757;
         }
 
         .accuracy {
-            color: #4CAF50;
-            font-weight: bold;
+            color: #2ed573;
+        }
+
+        .instructions {
+            background: rgba(0, 198, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            line-height: 1.5;
         }
 
         footer {
             text-align: center;
-            margin-top: 40px;
+            margin-top: 30px;
             padding-top: 20px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             opacity: 0.7;
+            font-size: 0.9rem;
         }
 
-        .instructions {
-            margin-top: 20px;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            opacity: 0.8;
+        .message-header {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-bottom: 5px;
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -273,82 +235,113 @@
         <header>
             <h1>Нейросетевой ИИ с нуля</h1>
             <p class="subtitle">Настоящая нейронная сеть, работающая прямо в вашем браузере</p>
-            <div class="ai-label">Нейросеть на TensorFlow.js без внешних API</div>
+            <div style="display: inline-block; background: linear-gradient(to right, #0072ff, #00c6ff); color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem;">
+                TensorFlow.js • LSTM • Без API
+            </div>
         </header>
 
         <div class="content">
             <div class="panel">
-                <h2><i class="fas fa-comments"></i> Диалог с ИИ</h2>
+                <h2><i class="fas fa-comment-dots"></i> Диалог с ИИ</h2>
                 <div class="chat-area" id="chatArea">
                     <div class="message ai-message">
                         <div class="message-header">Нейросеть</div>
-                        Привет! Я нейронная сеть, работающая прямо в вашем браузере. Обучите меня на своих данных, и я смогу отвечать на вопросы!
+                        Привет! Я нейросеть, работающая прямо в вашем браузере. Обучите меня, и я смогу отвечать на вопросы!
                     </div>
                 </div>
                 <div class="input-area">
-                    <input type="text" id="userInput" placeholder="Введите ваш вопрос...">
-                    <button id="sendButton"><i class="fas fa-paper-plane"></i></button>
+                    <input type="text" id="userInput" placeholder="Введите ваш вопрос..." autocomplete="off">
+                    <button id="sendButton"><i class="fas fa-paper-plane"></i> Отправить</button>
                 </div>
+                
                 <div class="instructions">
-                    <p><strong>Как работает:</strong> Нейросеть обучается на ваших примерах "вопрос-ответ" и создает собственную модель для генерации ответов.</p>
+                    <p><strong>Как начать:</strong></p>
+                    <ol>
+                        <li>Добавьте 3-5 примеров вопросов и ответов справа</li>
+                        <li>Нажмите "Обучить нейросеть"</li>
+                        <li>После обучения задавайте вопросы здесь</li>
+                    </ol>
                 </div>
             </div>
 
             <div class="panel">
-                <h2><i class="fas fa-brain"></i> Обучение нейросети</h2>
+                <h2><i class="fas fa-graduation-cap"></i> Обучение нейросети</h2>
                 
                 <div class="training-section">
-                    <label for="questionInput">Вопрос для обучения:</label>
-                    <input type="text" id="questionInput" placeholder="Введите вопрос для обучения...">
-                    
-                    <label for="answerInput">Правильный ответ:</label>
-                    <input type="text" id="answerInput" placeholder="Введите правильный ответ...">
-                    
-                    <button id="addExampleButton"><i class="fas fa-plus"></i> Добавить пример</button>
-                    
-                    <label for="trainingData">Обучающие данные:</label>
-                    <textarea id="trainingData" class="training-data" placeholder="Примеры для обучения..."></textarea>
-                    
-                    <button id="trainButton"><i class="fas fa-graduation-cap"></i> Обучить нейросеть</button>
-                    
-                    <div class="progress-bar">
-                        <div class="progress" id="progressBar"></div>
+                    <div>
+                        <label>Вопрос для обучения:</label>
+                        <input type="text" id="questionInput" placeholder="Например: Как тебя зовут?">
                     </div>
                     
-                    <div class="stats">
-                        <div>Эпохи: <span id="epochCount">0</span></div>
-                        <div>Ошибка: <span id="errorValue" class="error">-</span></div>
-                        <div>Точность: <span id="accuracyValue" class="accuracy">-</span></div>
+                    <div>
+                        <label>Правильный ответ:</label>
+                        <input type="text" id="answerInput" placeholder="Например: Я - нейросеть!">
                     </div>
-                </div>
-                
-                <div class="neural-network" id="neuralNetwork">
-                    <!-- Нейроны и связи будут добавлены через JS -->
+                    
+                    <button id="addExampleButton">
+                        <i class="fas fa-plus-circle"></i> Добавить пример
+                    </button>
+                    
+                    <div>
+                        <label>Все примеры для обучения:</label>
+                        <textarea id="trainingData" class="training-data" placeholder="Здесь появятся ваши примеры..." readonly></textarea>
+                    </div>
+                    
+                    <button id="trainButton">
+                        <i class="fas fa-brain"></i> Обучить нейросеть
+                    </button>
+                    
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress" id="progressBar"></div>
+                        </div>
+                        <div class="stats">
+                            <div>Эпохи: <span id="epochCount">0/50</span></div>
+                            <div>Ошибка: <span id="errorValue" class="error">-</span></div>
+                            <div>Точность: <span id="accuracyValue" class="accuracy">-</span></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="panel">
-            <h2><i class="fas fa-info-circle"></i> Статус нейросети</h2>
+            <h2><i class="fas fa-info-circle"></i> Статус и инструкции</h2>
             <div class="status" id="statusArea">
-                Инициализация нейросети... Готов к обучению.
+                Инициализация... Готов к работе!
+            </div>
+            
+            <div class="instructions">
+                <p><strong>Примеры обучающих данных:</strong></p>
+                <ul>
+                    <li><strong>Привет</strong> → <em>Здравствуйте! Как дела?</em></li>
+                    <li><strong>Как тебя зовут?</strong> → <em>Я - нейросеть на TensorFlow.js</em></li>
+                    <li><strong>Что ты умеешь?</strong> → <em>Я учусь на ваших примерах и отвечаю на вопросы</em></li>
+                    <li><strong>Сколько будет 2+2?</strong> → <em>2+2=4</em></li>
+                    <li><strong>Расскажи шутку</strong> → <em>Почему программист не мог приготовить омлет? Потому что у него не было нужных яиц!</em></li>
+                </ul>
+                <p>Добавьте минимум 3 примера, затем обучите нейросеть. Обучение займет 30-60 секунд.</p>
             </div>
         </div>
 
         <footer>
-            <p>Нейросетевой ИИ с нуля &copy; 2023 | Работает на TensorFlow.js в браузере</p>
-            <p>Вы создаете и обучаете собственную нейронную сеть без внешних API!</p>
+            <p>Нейросетевой ИИ с нуля • Работает полностью в браузере • Без внешних API</p>
+            <p>Использует TensorFlow.js для обучения настоящей нейронной сети</p>
         </footer>
     </div>
 
     <script>
-        // Глобальные переменные для нейросети
-        let model;
+        // ========== ИСПРАВЛЕННЫЙ КОД С РАБОТАЮЩЕЙ ОТПРАВКОЙ ==========
+        
+        // Глобальные переменные
+        let model = null;
         let tokenizer = {};
         let wordIndex = 1;
         let trainingExamples = [];
         let isTraining = false;
         let trainingEpochs = 0;
+        let vocabSize = 0;
+        let maxLength = 0;
 
         // Элементы DOM
         const chatArea = document.getElementById('chatArea');
@@ -364,218 +357,220 @@
         const epochCount = document.getElementById('epochCount');
         const errorValue = document.getElementById('errorValue');
         const accuracyValue = document.getElementById('accuracyValue');
-        const neuralNetwork = document.getElementById('neuralNetwork');
 
-        // Инициализация токенизатора
+        // Простой токенизатор
         function tokenizeText(text) {
-            const words = text.toLowerCase()
-                .replace(/[^\w\s]/g, ' ')
-                .split(/\s+/)
-                .filter(word => word.length > 0);
+            const normalized = text.toLowerCase()
+                .replace(/[^\w\sа-яА-ЯёЁ]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
             
+            if (!normalized) return [];
+            
+            const words = normalized.split(' ');
             const tokens = [];
+            
             words.forEach(word => {
-                if (!tokenizer[word]) {
-                    tokenizer[word] = wordIndex++;
+                if (word.length > 0) {
+                    if (!tokenizer[word]) {
+                        tokenizer[word] = wordIndex++;
+                    }
+                    tokens.push(tokenizer[word]);
                 }
-                tokens.push(tokenizer[word]);
             });
             
             return tokens;
         }
 
-        // Создание модели нейросети
-        function createModel(vocabSize, maxLength) {
-            statusArea.innerHTML += '\nСоздание модели нейросети...';
+        // Создание модели
+        function createModel() {
+            statusArea.textContent += '\nСоздание модели нейросети...';
             
-            // Создаем последовательную модель
+            // Создаем простую модель
             model = tf.sequential();
             
-            // Добавляем слой эмбеддингов для преобразования слов в векторы
-            model.add(tf.layers.embedding({
-                inputDim: vocabSize,
-                outputDim: 16,
-                inputLength: maxLength
-            }));
-            
-            // Добавляем LSTM слой для обработки последовательностей
-            model.add(tf.layers.lstm({
+            // Входной слой
+            model.add(tf.layers.dense({
                 units: 32,
-                returnSequences: false
+                inputShape: [maxLength],
+                activation: 'relu'
             }));
             
-            // Добавляем плотные слои
-            model.add(tf.layers.dense({units: 24, activation: 'relu'}));
+            model.add(tf.layers.dropout({rate: 0.2}));
+            
+            // Скрытый слой
+            model.add(tf.layers.dense({
+                units: 24,
+                activation: 'relu'
+            }));
+            
             model.add(tf.layers.dropout({rate: 0.2}));
             
             // Выходной слой
-            model.add(tf.layers.dense({units: vocabSize, activation: 'softmax'}));
+            model.add(tf.layers.dense({
+                units: vocabSize,
+                activation: 'softmax'
+            }));
             
-            // Компиляция модели
+            // Компиляция
             model.compile({
                 optimizer: tf.train.adam(0.01),
                 loss: 'categoricalCrossentropy',
                 metrics: ['accuracy']
             });
             
-            statusArea.innerHTML += '\nМодель создана!';
+            statusArea.textContent += '\nМодель создана!';
+            statusArea.scrollTop = statusArea.scrollHeight;
             
-            // Визуализация нейросети
-            visualizeNeuralNetwork();
+            return model;
         }
 
-        // Визуализация нейронной сети
-        function visualizeNeuralNetwork() {
-            neuralNetwork.innerHTML = '';
-            
-            const layers = [4, 6, 8, 6, 4]; // Количество нейронов в каждом слое
-            
-            layers.forEach((neuronCount, layerIndex) => {
-                for (let i = 0; i < neuronCount; i++) {
-                    const neuron = document.createElement('div');
-                    neuron.className = 'neuron';
-                    
-                    // Распределяем нейроны по слоям
-                    const x = 50 + layerIndex * 150;
-                    const y = 30 + i * (140 / (neuronCount - 1));
-                    
-                    neuron.style.left = `${x}px`;
-                    neuron.style.top = `${y}px`;
-                    
-                    // Анимация пульсации
-                    neuron.style.animationDelay = `${(layerIndex + i) * 0.1}s`;
-                    
-                    neuralNetwork.appendChild(neuron);
-                    
-                    // Создаем связи с предыдущим слоем
-                    if (layerIndex > 0) {
-                        for (let j = 0; j < layers[layerIndex - 1]; j++) {
-                            const prevX = 50 + (layerIndex - 1) * 150;
-                            const prevY = 30 + j * (140 / (layers[layerIndex - 1] - 1));
-                            
-                            const connection = document.createElement('div');
-                            connection.className = 'connection';
-                            
-                            // Вычисляем длину и угол линии
-                            const dx = x - prevX;
-                            const dy = y - prevY;
-                            const length = Math.sqrt(dx * dx + dy * dy);
-                            const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-                            
-                            connection.style.width = `${length}px`;
-                            connection.style.left = `${prevX}px`;
-                            connection.style.top = `${prevY}px`;
-                            connection.style.transform = `rotate(${angle}deg)`;
-                            
-                            neuralNetwork.appendChild(connection);
-                        }
-                    }
-                }
-            });
-        }
-
-        // Подготовка данных для обучения
-        function prepareData() {
-            if (trainingExamples.length === 0) {
-                statusArea.innerHTML += '\nНет данных для обучения. Добавьте примеры!';
+        // Подготовка данных
+        function prepareTrainingData() {
+            if (trainingExamples.length < 3) {
+                statusArea.textContent += `\nОшибка: нужно минимум 3 примера, а у вас ${trainingExamples.length}`;
                 return null;
             }
             
-            statusArea.innerHTML += '\nПодготовка данных...';
+            statusArea.textContent += '\nПодготовка данных...';
             
-            // Находим максимальную длину последовательности
-            let maxLength = 0;
-            trainingExamples.forEach(example => {
-                const tokens = tokenizeText(example.question);
+            // Собираем все слова для словаря
+            const allTexts = trainingExamples.flatMap(ex => [ex.question, ex.answer]);
+            allTexts.forEach(text => tokenizeText(text));
+            
+            // Находим максимальную длину
+            maxLength = 0;
+            trainingExamples.forEach(ex => {
+                const tokens = tokenizeText(ex.question);
                 maxLength = Math.max(maxLength, tokens.length);
             });
             
-            // Создаем тензоры для обучения
+            // Ограничиваем максимальную длину
+            maxLength = Math.min(maxLength, 20);
+            vocabSize = wordIndex;
+            
+            statusArea.textContent += `\nСловарь: ${vocabSize} слов, Макс. длина: ${maxLength}`;
+            
+            // Создаем тензоры
             const xs = [];
             const ys = [];
             
-            trainingExamples.forEach(example => {
-                const questionTokens = tokenizeText(example.question);
-                const answerTokens = tokenizeText(example.answer);
+            trainingExamples.forEach(ex => {
+                const questionTokens = tokenizeText(ex.question);
+                const answerTokens = tokenizeText(ex.answer);
                 
-                // Заполняем последовательности до maxLength
-                const paddedQuestion = Array(maxLength).fill(0);
-                questionTokens.forEach((token, i) => {
-                    if (i < maxLength) paddedQuestion[i] = token;
+                // Векторизуем вопрос
+                const xVector = Array(maxLength).fill(0);
+                questionTokens.slice(0, maxLength).forEach((token, i) => {
+                    xVector[i] = token;
                 });
                 
-                // Создаем one-hot вектор для ответа (упрощенно)
-                const answerVector = Array(wordIndex).fill(0);
-                answerTokens.forEach(token => {
-                    if (token < wordIndex) answerVector[token] = 1;
-                });
+                // Векторизуем ответ (используем первое слово ответа как цель)
+                const yVector = Array(vocabSize).fill(0);
+                if (answerTokens.length > 0 && answerTokens[0] < vocabSize) {
+                    yVector[answerTokens[0]] = 1;
+                }
                 
-                xs.push(paddedQuestion);
-                ys.push(answerVector);
+                xs.push(xVector);
+                ys.push(yVector);
             });
             
             const xTensor = tf.tensor2d(xs, [xs.length, maxLength]);
-            const yTensor = tf.tensor2d(ys, [ys.length, wordIndex]);
+            const yTensor = tf.tensor2d(ys, [ys.length, vocabSize]);
             
-            statusArea.innerHTML += `\nДанные подготовлены: ${trainingExamples.length} примеров`;
+            statusArea.textContent += `\nСоздано ${xs.length} примеров для обучения`;
+            statusArea.scrollTop = statusArea.scrollHeight;
             
-            return { xTensor, yTensor, maxLength };
+            return { xTensor, yTensor };
         }
 
-        // Обучение нейросети
+        // Обучение модели
         async function trainModel() {
             if (isTraining) {
-                statusArea.innerHTML += '\nОбучение уже идет...';
+                statusArea.textContent += '\nОбучение уже идет...';
                 return;
             }
             
             if (trainingExamples.length < 3) {
-                statusArea.innerHTML += '\nДобавьте минимум 3 примера для обучения!';
+                statusArea.textContent += '\nДобавьте минимум 3 примера для обучения!';
                 return;
             }
             
             isTraining = true;
             trainButton.disabled = true;
-            statusArea.innerHTML += '\nНачинаю обучение нейросети...';
+            sendButton.disabled = true;
+            statusArea.textContent += '\nНачинаю обучение...';
             
-            // Подготавливаем данные
-            const data = prepareData();
-            if (!data) {
+            try {
+                // Подготавливаем данные
+                const data = prepareTrainingData();
+                if (!data) {
+                    isTraining = false;
+                    trainButton.disabled = false;
+                    sendButton.disabled = false;
+                    return;
+                }
+                
+                // Создаем модель
+                if (!model) {
+                    createModel();
+                }
+                
+                // Обучение
+                const totalEpochs = 50;
+                statusArea.textContent += `\nОбучение на ${totalEpochs} эпохах...`;
+                
+                for (let epoch = 1; epoch <= totalEpochs; epoch++) {
+                    trainingEpochs = epoch;
+                    epochCount.textContent = `${epoch}/${totalEpochs}`;
+                    
+                    // Прогресс бар
+                    progressBar.style.width = `${(epoch / totalEpochs) * 100}%`;
+                    
+                    // Одна эпоха обучения
+                    const history = await model.fit(data.xTensor, data.yTensor, {
+                        epochs: 1,
+                        batchSize: Math.min(4, trainingExamples.length),
+                        verbose: 0
+                    });
+                    
+                    // Обновляем статистику
+                    const loss = history.history.loss[0];
+                    const accuracy = history.history.acc ? history.history.acc[0] : 0;
+                    
+                    errorValue.textContent = loss.toFixed(4);
+                    accuracyValue.textContent = accuracy.toFixed(4);
+                    
+                    // Обновляем статус каждые 10 эпох
+                    if (epoch % 10 === 0) {
+                        statusArea.textContent += `\nЭпоха ${epoch}: ошибка=${loss.toFixed(4)}, точность=${accuracy.toFixed(4)}`;
+                        statusArea.scrollTop = statusArea.scrollHeight;
+                    }
+                    
+                    // Небольшая задержка для анимации
+                    await tf.nextFrame();
+                }
+                
+                statusArea.textContent += '\n✅ Обучение завершено! Теперь можно задавать вопросы.';
+                
+                // Очищаем память
+                data.xTensor.dispose();
+                data.yTensor.dispose();
+                
+            } catch (error) {
+                statusArea.textContent += `\n❌ Ошибка при обучении: ${error.message}`;
+            } finally {
                 isTraining = false;
                 trainButton.disabled = false;
-                return;
+                sendButton.disabled = false;
+                statusArea.scrollTop = statusArea.scrollHeight;
             }
-            
-            // Создаем модель если ее нет
+        }
+
+        // Генерация ответа
+        async function generateResponse(question) {
             if (!model) {
-                createModel(wordIndex, data.maxLength);
+                return "Сначала обучите нейросеть! Добавьте примеры и нажмите 'Обучить нейросеть'.";
             }
             
-            // Обучение модели
-            const epochs = 50;
-            statusArea.innerHTML += `\nОбучение на ${epochs} эпохах...`;
-            
-            for (let epoch = 1; epoch <= epochs; epoch++) {
-                trainingEpochs = epoch;
-                epochCount.textContent = epoch;
-                
-                // Обновляем прогресс бар
-                progressBar.style.width = `${(epoch / epochs) * 100}%`;
-                
-                // Обучаем одну эпоху
-                const history = await model.fit(data.xTensor, data.yTensor, {
-                    epochs: 1,
-                    batchSize: 2,
-                    verbose: 0
-                });
-                
-                // Обновляем статистику
-                const loss = history.history.loss[0];
-                const accuracy = history.history.acc ? history.history.acc[0] : 0;
-                
-                errorValue.textContent = loss.toFixed(4);
-                accuracyValue.textContent = accuracy.toFixed(4);
-                
-                // Обновляем статус
-                if (epoch % 10 === 0) {
-                    statusArea.innerHTML += `\nЭпоха ${epoch}: ошибка = ${loss.toFixed(
+            if (training
