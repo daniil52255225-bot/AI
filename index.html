@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ручной ИИ - Задайте вопрос</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Нейросетевой ИИ с нуля</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0/dist/tf.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -14,464 +14,568 @@
         }
 
         body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #f0f0f0;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            color: #ffffff;
             min-height: 100vh;
             padding: 20px;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
         header {
             text-align: center;
-            padding: 30px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 30px;
+            padding: 40px 0;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 40px;
         }
 
         h1 {
-            font-size: 2.8rem;
-            margin-bottom: 10px;
-            background: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(to right, #ff5e62 0%, #ff9966 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
         .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.8;
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
         }
 
         .ai-label {
             display: inline-block;
-            background-color: #2575fc;
+            background: linear-gradient(to right, #ff5e62 0%, #ff9966 100%);
             color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            margin-top: 10px;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.1rem;
         }
 
-        .main-content {
-            display: flex;
-            flex-direction: column;
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 30px;
+            margin-bottom: 40px;
         }
 
-        .chat-container {
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
         }
 
-        .chat-header {
-            background-color: rgba(0, 0, 0, 0.2);
-            padding: 15px 20px;
-            font-weight: 600;
+        .panel {
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .panel h2 {
+            color: #ff9966;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .chat-header i {
-            color: #6a11cb;
+        .panel h2 i {
+            font-size: 1.5rem;
         }
 
-        .chat-messages {
+        .chat-area {
             height: 400px;
             overflow-y: auto;
             padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            margin-bottom: 20px;
         }
 
         .message {
-            max-width: 80%;
             padding: 15px;
+            margin-bottom: 15px;
             border-radius: 15px;
-            line-height: 1.5;
-            position: relative;
+            max-width: 80%;
         }
 
         .user-message {
-            background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
-            align-self: flex-end;
-            border-bottom-right-radius: 5px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin-left: auto;
+            text-align: right;
         }
 
         .ai-message {
-            background-color: rgba(255, 255, 255, 0.1);
-            align-self: flex-start;
-            border-bottom-left-radius: 5px;
+            background: linear-gradient(135deg, #ff5e62 0%, #ff9966 100%);
+            margin-right: auto;
         }
 
-        .message-sender {
+        .message-header {
             font-size: 0.8rem;
-            opacity: 0.7;
+            opacity: 0.8;
             margin-bottom: 5px;
         }
 
         .input-area {
             display: flex;
-            padding: 20px;
-            background-color: rgba(0, 0, 0, 0.2);
             gap: 10px;
         }
 
-        input {
+        input, textarea {
             flex: 1;
-            padding: 15px 20px;
-            border: none;
-            border-radius: 10px;
-            background-color: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
             color: white;
             font-size: 1rem;
-            outline: none;
         }
 
-        input:focus {
-            background-color: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 0 0 2px #6a11cb;
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #ff9966;
+            background: rgba(255, 255, 255, 0.15);
         }
 
         button {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 0 25px;
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: bold;
             cursor: pointer;
-            transition: transform 0.2s, opacity 0.2s;
+            transition: all 0.3s ease;
         }
 
         button:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(0, 0, 0, 0.4);
         }
 
         button:active {
             transform: translateY(0);
         }
 
-        .knowledge-base {
-            background-color: rgba(255, 255, 255, 0.05);
+        .training-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .training-data {
+            height: 200px;
+            resize: vertical;
+        }
+
+        .status {
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
             border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .knowledge-base h3 {
-            margin-bottom: 15px;
-            color: #6a11cb;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .topics {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .topic {
-            background-color: rgba(106, 17, 203, 0.2);
-            padding: 8px 15px;
-            border-radius: 20px;
+            font-family: monospace;
             font-size: 0.9rem;
-            border: 1px solid #6a11cb;
-            cursor: pointer;
-            transition: all 0.2s;
+            height: 100px;
+            overflow-y: auto;
         }
 
-        .topic:hover {
-            background-color: rgba(106, 17, 203, 0.4);
+        .neuron {
+            width: 20px;
+            height: 20px;
+            background: #ff9966;
+            border-radius: 50%;
+            position: absolute;
+            animation: pulse 2s infinite;
         }
 
-        .knowledge-list {
-            list-style-type: none;
-            margin-top: 15px;
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.7; }
         }
 
-        .knowledge-list li {
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        .neural-network {
+            position: relative;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .connection {
+            position: absolute;
+            height: 2px;
+            background: rgba(255, 153, 102, 0.5);
+            transform-origin: 0 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #ff5e62, #ff9966);
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        .stats {
             display: flex;
             justify-content: space-between;
-        }
-
-        .question {
-            color: #6a11cb;
-        }
-
-        .instructions {
-            margin-top: 30px;
+            margin-top: 20px;
             font-size: 0.9rem;
             opacity: 0.8;
-            line-height: 1.6;
-            text-align: center;
+        }
+
+        .error {
+            color: #ff5e62;
+            font-weight: bold;
+        }
+
+        .accuracy {
+            color: #4CAF50;
+            font-weight: bold;
         }
 
         footer {
-            margin-top: 40px;
             text-align: center;
+            margin-top: 40px;
             padding-top: 20px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             opacity: 0.7;
-            font-size: 0.9rem;
         }
 
-        /* Адаптивность */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .chat-messages {
-                height: 350px;
-            }
-            
-            .message {
-                max-width: 90%;
-            }
-            
-            .input-area {
-                flex-direction: column;
-            }
-            
-            input {
-                width: 100%;
-            }
+        .instructions {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            opacity: 0.8;
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Вопросы к "ручному" ИИ</h1>
-            <p class="subtitle">Задайте вопрос и получите ответ из заранее подготовленной базы знаний</p>
-            <div class="ai-label">Имитация ИИ (без реального ИИ)</div>
+            <h1>Нейросетевой ИИ с нуля</h1>
+            <p class="subtitle">Настоящая нейронная сеть, работающая прямо в вашем браузере</p>
+            <div class="ai-label">Нейросеть на TensorFlow.js без внешних API</div>
         </header>
 
-        <div class="main-content">
-            <div class="chat-container">
-                <div class="chat-header">
-                    <i class="fas fa-robot"></i>
-                    <span>Диалог с "ручным" ИИ</span>
-                </div>
-                
-                <div class="chat-messages" id="chatMessages">
-                    <!-- Сообщения будут добавляться здесь -->
+        <div class="content">
+            <div class="panel">
+                <h2><i class="fas fa-comments"></i> Диалог с ИИ</h2>
+                <div class="chat-area" id="chatArea">
                     <div class="message ai-message">
-                        <div class="message-sender">Ручной ИИ</div>
-                        Привет! Я "ручной" ИИ. Я отвечаю на вопросы, используя заранее подготовленную базу знаний. Спросите меня о чем-нибудь из списка тем ниже, или задайте свой вопрос.
+                        <div class="message-header">Нейросеть</div>
+                        Привет! Я нейронная сеть, работающая прямо в вашем браузере. Обучите меня на своих данных, и я смогу отвечать на вопросы!
+                    </div>
+                </div>
+                <div class="input-area">
+                    <input type="text" id="userInput" placeholder="Введите ваш вопрос...">
+                    <button id="sendButton"><i class="fas fa-paper-plane"></i></button>
+                </div>
+                <div class="instructions">
+                    <p><strong>Как работает:</strong> Нейросеть обучается на ваших примерах "вопрос-ответ" и создает собственную модель для генерации ответов.</p>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2><i class="fas fa-brain"></i> Обучение нейросети</h2>
+                
+                <div class="training-section">
+                    <label for="questionInput">Вопрос для обучения:</label>
+                    <input type="text" id="questionInput" placeholder="Введите вопрос для обучения...">
+                    
+                    <label for="answerInput">Правильный ответ:</label>
+                    <input type="text" id="answerInput" placeholder="Введите правильный ответ...">
+                    
+                    <button id="addExampleButton"><i class="fas fa-plus"></i> Добавить пример</button>
+                    
+                    <label for="trainingData">Обучающие данные:</label>
+                    <textarea id="trainingData" class="training-data" placeholder="Примеры для обучения..."></textarea>
+                    
+                    <button id="trainButton"><i class="fas fa-graduation-cap"></i> Обучить нейросеть</button>
+                    
+                    <div class="progress-bar">
+                        <div class="progress" id="progressBar"></div>
+                    </div>
+                    
+                    <div class="stats">
+                        <div>Эпохи: <span id="epochCount">0</span></div>
+                        <div>Ошибка: <span id="errorValue" class="error">-</span></div>
+                        <div>Точность: <span id="accuracyValue" class="accuracy">-</span></div>
                     </div>
                 </div>
                 
-                <div class="input-area">
-                    <input type="text" id="questionInput" placeholder="Введите ваш вопрос здесь...">
-                    <button id="askButton">
-                        <i class="fas fa-paper-plane"></i> Спросить
-                    </button>
+                <div class="neural-network" id="neuralNetwork">
+                    <!-- Нейроны и связи будут добавлены через JS -->
                 </div>
             </div>
+        </div>
 
-            <div class="knowledge-base">
-                <h3><i class="fas fa-brain"></i> База знаний ИИ</h3>
-                <p>ИИ обучен отвечать на вопросы по следующим темам:</p>
-                
-                <div class="topics" id="topicButtons">
-                    <!-- Темы будут добавляться через JavaScript -->
-                </div>
-                
-                <h3><i class="fas fa-database"></i> Примеры вопросов и ответов</h3>
-                <ul class="knowledge-list" id="knowledgeList">
-                    <!-- Примеры вопросов будут добавляться через JavaScript -->
-                </ul>
-            </div>
-            
-            <div class="instructions">
-                <p><strong>Как это работает:</strong> Это не реальный ИИ, а система, которая сопоставляет ваш вопрос с заранее подготовленными ответами. Если вопрос не найден в базе знаний, ИИ ответит, что не знает ответа.</p>
-                <p>Вы можете легко настроить ответы, отредактировав JavaScript код в конце файла.</p>
+        <div class="panel">
+            <h2><i class="fas fa-info-circle"></i> Статус нейросети</h2>
+            <div class="status" id="statusArea">
+                Инициализация нейросети... Готов к обучению.
             </div>
         </div>
 
         <footer>
-            <p>Сайт для GitHub &copy; 2023 | "Ручной" ИИ без использования ChatGPT, Gemini и других реальных ИИ</p>
+            <p>Нейросетевой ИИ с нуля &copy; 2023 | Работает на TensorFlow.js в браузере</p>
+            <p>Вы создаете и обучаете собственную нейронную сеть без внешних API!</p>
         </footer>
     </div>
 
     <script>
-        // База знаний "ручного" ИИ
-        const knowledgeBase = {
-            "приветствие": {
-                вопросы: ["привет", "здравствуй", "добрый день", "hello", "hi"],
-                ответ: "Привет! Рад вас видеть. Чем могу помочь?"
-            },
-            "о себе": {
-                вопросы: ["кто ты", "что ты", "расскажи о себе", "твои создатели"],
-                ответ: "Я 'ручной' ИИ, созданный для демонстрации работы системы ответов на вопросы без использования реального искусственного интеллекта. Мои ответы подготовлены заранее и основаны на базе знаний."
-            },
-            "технологии": {
-                вопросы: ["что такое html", "объясни css", "что такое javascript", "веб разработка"],
-                ответ: "HTML, CSS и JavaScript - основные технологии веб-разработки. HTML определяет структуру, CSS отвечает за оформление, а JavaScript добавляет интерактивность."
-            },
-            "программирование": {
-                вопросы: ["языки программирования", "какой язык учить", "как начать программировать"],
-                ответ: "Начать программировать можно с любого языка, но популярные варианты для новичков: Python, JavaScript, Java. Главное - понять базовые концепции программирования."
-            },
-            "github": {
-                вопросы: ["что такое гитхаб", "зачем использовать github", "как работать с git"],
-                ответ: "GitHub - платформа для хранения и совместной работы над кодом с использованием системы контроля версий Git. Она позволяет отслеживать изменения, работать в команде и делиться проектами."
-            },
-            "будущее": {
-                вопросы: ["что будет завтра", "прогноз на будущее", "что будет с технологиями"],
-                ответ: "Будущее технологий включает развитие искусственного интеллекта, квантовых вычислений, расширенной реальности и биотехнологий. Но точных предсказаний не может дать даже 'ручной' ИИ!"
-            },
-            "помощь": {
-                вопросы: ["помощь", "что ты умеешь", "какие команды", "функции"],
-                ответ: "Я могу отвечать на вопросы по темам, указанным в базе знаний. Попробуйте спросить о технологиях, программировании, GitHub или просто поздороваться!"
-            }
-        };
+        // Глобальные переменные для нейросети
+        let model;
+        let tokenizer = {};
+        let wordIndex = 1;
+        let trainingExamples = [];
+        let isTraining = false;
+        let trainingEpochs = 0;
 
         // Элементы DOM
-        const chatMessages = document.getElementById('chatMessages');
+        const chatArea = document.getElementById('chatArea');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
         const questionInput = document.getElementById('questionInput');
-        const askButton = document.getElementById('askButton');
-        const topicButtons = document.getElementById('topicButtons');
-        const knowledgeList = document.getElementById('knowledgeList');
+        const answerInput = document.getElementById('answerInput');
+        const trainingData = document.getElementById('trainingData');
+        const addExampleButton = document.getElementById('addExampleButton');
+        const trainButton = document.getElementById('trainButton');
+        const statusArea = document.getElementById('statusArea');
+        const progressBar = document.getElementById('progressBar');
+        const epochCount = document.getElementById('epochCount');
+        const errorValue = document.getElementById('errorValue');
+        const accuracyValue = document.getElementById('accuracyValue');
+        const neuralNetwork = document.getElementById('neuralNetwork');
 
-        // Инициализация кнопок тем
-        function initTopicButtons() {
-            for (const topic in knowledgeBase) {
-                const button = document.createElement('div');
-                button.className = 'topic';
-                button.textContent = topic;
-                button.addEventListener('click', () => {
-                    questionInput.value = knowledgeBase[topic].вопросы[0];
-                });
-                topicButtons.appendChild(button);
-            }
-        }
-
-        // Инициализация списка знаний
-        function initKnowledgeList() {
-            for (const topic in knowledgeBase) {
-                const li = document.createElement('li');
-                const question = document.createElement('span');
-                question.className = 'question';
-                question.textContent = knowledgeBase[topic].вопросы[0];
-                
-                const answer = document.createElement('span');
-                answer.textContent = knowledgeBase[topic].ответ.substring(0, 50) + '...';
-                
-                li.appendChild(question);
-                li.appendChild(answer);
-                knowledgeList.appendChild(li);
-            }
-        }
-
-        // Поиск ответа в базе знаний
-        function findAnswer(question) {
-            const normalizedQuestion = question.toLowerCase().trim();
+        // Инициализация токенизатора
+        function tokenizeText(text) {
+            const words = text.toLowerCase()
+                .replace(/[^\w\s]/g, ' ')
+                .split(/\s+/)
+                .filter(word => word.length > 0);
             
-            for (const topic in knowledgeBase) {
-                for (const keyword of knowledgeBase[topic].вопросы) {
-                    if (normalizedQuestion.includes(keyword.toLowerCase())) {
-                        return knowledgeBase[topic].ответ;
+            const tokens = [];
+            words.forEach(word => {
+                if (!tokenizer[word]) {
+                    tokenizer[word] = wordIndex++;
+                }
+                tokens.push(tokenizer[word]);
+            });
+            
+            return tokens;
+        }
+
+        // Создание модели нейросети
+        function createModel(vocabSize, maxLength) {
+            statusArea.innerHTML += '\nСоздание модели нейросети...';
+            
+            // Создаем последовательную модель
+            model = tf.sequential();
+            
+            // Добавляем слой эмбеддингов для преобразования слов в векторы
+            model.add(tf.layers.embedding({
+                inputDim: vocabSize,
+                outputDim: 16,
+                inputLength: maxLength
+            }));
+            
+            // Добавляем LSTM слой для обработки последовательностей
+            model.add(tf.layers.lstm({
+                units: 32,
+                returnSequences: false
+            }));
+            
+            // Добавляем плотные слои
+            model.add(tf.layers.dense({units: 24, activation: 'relu'}));
+            model.add(tf.layers.dropout({rate: 0.2}));
+            
+            // Выходной слой
+            model.add(tf.layers.dense({units: vocabSize, activation: 'softmax'}));
+            
+            // Компиляция модели
+            model.compile({
+                optimizer: tf.train.adam(0.01),
+                loss: 'categoricalCrossentropy',
+                metrics: ['accuracy']
+            });
+            
+            statusArea.innerHTML += '\nМодель создана!';
+            
+            // Визуализация нейросети
+            visualizeNeuralNetwork();
+        }
+
+        // Визуализация нейронной сети
+        function visualizeNeuralNetwork() {
+            neuralNetwork.innerHTML = '';
+            
+            const layers = [4, 6, 8, 6, 4]; // Количество нейронов в каждом слое
+            
+            layers.forEach((neuronCount, layerIndex) => {
+                for (let i = 0; i < neuronCount; i++) {
+                    const neuron = document.createElement('div');
+                    neuron.className = 'neuron';
+                    
+                    // Распределяем нейроны по слоям
+                    const x = 50 + layerIndex * 150;
+                    const y = 30 + i * (140 / (neuronCount - 1));
+                    
+                    neuron.style.left = `${x}px`;
+                    neuron.style.top = `${y}px`;
+                    
+                    // Анимация пульсации
+                    neuron.style.animationDelay = `${(layerIndex + i) * 0.1}s`;
+                    
+                    neuralNetwork.appendChild(neuron);
+                    
+                    // Создаем связи с предыдущим слоем
+                    if (layerIndex > 0) {
+                        for (let j = 0; j < layers[layerIndex - 1]; j++) {
+                            const prevX = 50 + (layerIndex - 1) * 150;
+                            const prevY = 30 + j * (140 / (layers[layerIndex - 1] - 1));
+                            
+                            const connection = document.createElement('div');
+                            connection.className = 'connection';
+                            
+                            // Вычисляем длину и угол линии
+                            const dx = x - prevX;
+                            const dy = y - prevY;
+                            const length = Math.sqrt(dx * dx + dy * dy);
+                            const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                            
+                            connection.style.width = `${length}px`;
+                            connection.style.left = `${prevX}px`;
+                            connection.style.top = `${prevY}px`;
+                            connection.style.transform = `rotate(${angle}deg)`;
+                            
+                            neuralNetwork.appendChild(connection);
+                        }
                     }
                 }
+            });
+        }
+
+        // Подготовка данных для обучения
+        function prepareData() {
+            if (trainingExamples.length === 0) {
+                statusArea.innerHTML += '\nНет данных для обучения. Добавьте примеры!';
+                return null;
             }
             
-            return null;
+            statusArea.innerHTML += '\nПодготовка данных...';
+            
+            // Находим максимальную длину последовательности
+            let maxLength = 0;
+            trainingExamples.forEach(example => {
+                const tokens = tokenizeText(example.question);
+                maxLength = Math.max(maxLength, tokens.length);
+            });
+            
+            // Создаем тензоры для обучения
+            const xs = [];
+            const ys = [];
+            
+            trainingExamples.forEach(example => {
+                const questionTokens = tokenizeText(example.question);
+                const answerTokens = tokenizeText(example.answer);
+                
+                // Заполняем последовательности до maxLength
+                const paddedQuestion = Array(maxLength).fill(0);
+                questionTokens.forEach((token, i) => {
+                    if (i < maxLength) paddedQuestion[i] = token;
+                });
+                
+                // Создаем one-hot вектор для ответа (упрощенно)
+                const answerVector = Array(wordIndex).fill(0);
+                answerTokens.forEach(token => {
+                    if (token < wordIndex) answerVector[token] = 1;
+                });
+                
+                xs.push(paddedQuestion);
+                ys.push(answerVector);
+            });
+            
+            const xTensor = tf.tensor2d(xs, [xs.length, maxLength]);
+            const yTensor = tf.tensor2d(ys, [ys.length, wordIndex]);
+            
+            statusArea.innerHTML += `\nДанные подготовлены: ${trainingExamples.length} примеров`;
+            
+            return { xTensor, yTensor, maxLength };
         }
 
-        // Добавление сообщения пользователя
-        function addUserMessage(text) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message user-message';
-            
-            const senderDiv = document.createElement('div');
-            senderDiv.className = 'message-sender';
-            senderDiv.textContent = 'Вы';
-            
-            const textDiv = document.createElement('div');
-            textDiv.textContent = text;
-            
-            messageDiv.appendChild(senderDiv);
-            messageDiv.appendChild(textDiv);
-            chatMessages.appendChild(messageDiv);
-            
-            // Прокрутка вниз
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        // Добавление сообщения ИИ
-        function addAiMessage(text) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message ai-message';
-            
-            const senderDiv = document.createElement('div');
-            senderDiv.className = 'message-sender';
-            senderDiv.textContent = 'Ручной ИИ';
-            
-            const textDiv = document.createElement('div');
-            textDiv.textContent = text;
-            
-            messageDiv.appendChild(senderDiv);
-            messageDiv.appendChild(textDiv);
-            chatMessages.appendChild(messageDiv);
-            
-            // Прокрутка вниз
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        // Обработка вопроса
-        function processQuestion() {
-            const question = questionInput.value.trim();
-            
-            if (!question) return;
-            
-            // Добавляем вопрос пользователя
-            addUserMessage(question);
-            
-            // Очищаем поле ввода
-            questionInput.value = '';
-            
-            // Ищем ответ
-            const answer = findAnswer(question);
-            
-            // Имитируем задержку "размышления" ИИ
-            setTimeout(() => {
-                if (answer) {
-                    addAiMessage(answer);
-                } else {
-                    addAiMessage("Извините, я не знаю ответа на этот вопрос. Моя база знаний ограничена заранее подготовленными ответами. Попробуйте задать вопрос по одной из тем, указанных выше.");
-                }
-            }, 800);
-        }
-
-        // Обработчики событий
-        askButton.addEventListener('click', processQuestion);
-        
-        questionInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                processQuestion();
+        // Обучение нейросети
+        async function trainModel() {
+            if (isTraining) {
+                statusArea.innerHTML += '\nОбучение уже идет...';
+                return;
             }
-        });
-
-        // Инициализация
-        initTopicButtons();
-        initKnowledgeList();
-    </script>
-</body>
-</html>
+            
+            if (trainingExamples.length < 3) {
+                statusArea.innerHTML += '\nДобавьте минимум 3 примера для обучения!';
+                return;
+            }
+            
+            isTraining = true;
+            trainButton.disabled = true;
+            statusArea.innerHTML += '\nНачинаю обучение нейросети...';
+            
+            // Подготавливаем данные
+            const data = prepareData();
+            if (!data) {
+                isTraining = false;
+                trainButton.disabled = false;
+                return;
+            }
+            
+            // Создаем модель если ее нет
+            if (!model) {
+                createModel(wordIndex, data.maxLength);
+            }
+            
+            // Обучение модели
+            const epochs = 50;
+            statusArea.innerHTML += `\nОбучение на ${epochs} эпохах...`;
+            
+            for (let epoch = 1; epoch <= epochs; epoch++) {
+                trainingEpochs = epoch;
+                epochCount.textContent = epoch;
+                
+                // Обновляем прогресс бар
+                progressBar.style.width = `${(epoch / epochs) * 100}%`;
+                
+                // Обучаем одну эпоху
+                const history = await model.fit(data.xTensor, data.yTensor, {
+                    epochs: 1,
+                    batchSize: 2,
+                    verbose: 0
+                });
+                
+                // Обновляем статистику
+                const loss = history.history.loss[0];
+                const accuracy = history.history.acc ? history.history.acc[0] : 0;
+                
+                errorValue.textContent = loss.toFixed(4);
+                accuracyValue.textContent = accuracy.toFixed(4);
+                
+                // Обновляем статус
+                if (epoch % 10 === 0) {
+                    statusArea.innerHTML += `\nЭпоха ${epoch}: ошибка = ${loss.toFixed(
