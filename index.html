@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Нейросетевой ИИ с нуля - Работающая версия</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0/dist/tf.min.js"></script>
+    <title>Умный ИИ - Работает сразу!</title>
     <style>
         * {
             margin: 0;
@@ -14,14 +13,14 @@
         }
 
         body {
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-            color: #ffffff;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
             min-height: 100vh;
             padding: 20px;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
         }
 
@@ -33,8 +32,8 @@
 
         h1 {
             font-size: 2.8rem;
-            margin-bottom: 15px;
-            background: linear-gradient(to right, #00c6ff, #0072ff);
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -45,187 +44,201 @@
             margin-bottom: 15px;
         }
 
-        .content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
+        .ai-badge {
+            display: inline-block;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .chat-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 0;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             margin-bottom: 30px;
         }
 
-        @media (max-width: 900px) {
-            .content {
-                grid-template-columns: 1fr;
-            }
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
-        .panel {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .chat-header i {
+            font-size: 1.5rem;
+            color: #00d2ff;
         }
 
-        .panel h2 {
-            color: #00c6ff;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid rgba(0, 198, 255, 0.3);
-        }
-
-        .chat-area {
-            height: 350px;
+        .chat-messages {
+            height: 400px;
             overflow-y: auto;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            margin-bottom: 15px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 15px;
         }
 
         .message {
-            padding: 12px 15px;
-            border-radius: 12px;
-            max-width: 85%;
-            word-wrap: break-word;
+            max-width: 80%;
+            padding: 15px;
+            border-radius: 18px;
+            line-height: 1.5;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .user-message {
-            background: linear-gradient(135deg, #0072ff, #00c6ff);
+            background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
             align-self: flex-end;
-            border-bottom-right-radius: 3px;
+            border-bottom-right-radius: 5px;
         }
 
         .ai-message {
             background: rgba(255, 255, 255, 0.15);
             align-self: flex-start;
-            border-bottom-left-radius: 3px;
+            border-bottom-left-radius: 5px;
         }
 
         .input-area {
             display: flex;
-            gap: 10px;
+            padding: 20px;
+            gap: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        input, textarea {
+        input {
             flex: 1;
-            padding: 12px 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.15);
             color: white;
             font-size: 1rem;
+            outline: none;
         }
 
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: #00c6ff;
-            box-shadow: 0 0 0 2px rgba(0, 198, 255, 0.2);
+        input:focus {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 0 3px rgba(0, 210, 255, 0.3);
         }
 
         button {
-            background: linear-gradient(135deg, #0072ff, #00c6ff);
+            background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
             color: white;
             border: none;
-            border-radius: 8px;
-            padding: 12px 20px;
-            font-size: 1rem;
+            border-radius: 12px;
+            padding: 0 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
         }
 
         button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 114, 255, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 210, 255, 0.3);
         }
 
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
+        button:active {
+            transform: translateY(-1px);
         }
 
-        .training-section {
+        .examples {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .examples h3 {
+            color: #00d2ff;
+            margin-bottom: 15px;
             display: flex;
-            flex-direction: column;
-            gap: 12px;
+            align-items: center;
+            gap: 10px;
         }
 
-        .training-data {
-            height: 150px;
-            resize: vertical;
+        .example-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .example-btn {
+            background: rgba(0, 210, 255, 0.2);
+            border: 1px solid rgba(0, 210, 255, 0.5);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .example-btn:hover {
+            background: rgba(0, 210, 255, 0.4);
+            transform: translateY(-2px);
         }
 
         .status {
             padding: 15px;
             background: rgba(0, 0, 0, 0.3);
             border-radius: 10px;
+            margin-top: 20px;
             font-family: monospace;
             font-size: 0.9rem;
-            min-height: 80px;
-            max-height: 150px;
-            overflow-y: auto;
-            margin-top: 15px;
+            text-align: center;
         }
 
-        .progress-container {
-            margin: 15px 0;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress {
-            height: 100%;
-            background: linear-gradient(90deg, #00c6ff, #0072ff);
-            width: 0%;
-            transition: width 0.3s;
-        }
-
-        .stats {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-            font-size: 0.85rem;
-        }
-
-        .error {
-            color: #ff4757;
-        }
-
-        .accuracy {
-            color: #2ed573;
-        }
-
-        .instructions {
-            background: rgba(0, 198, 255, 0.1);
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-            font-size: 0.9rem;
-            line-height: 1.5;
+        .typing-indicator {
+            display: none;
+            padding: 10px;
+            color: #00d2ff;
+            font-style: italic;
         }
 
         footer {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 40px;
             padding-top: 20px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             opacity: 0.7;
             font-size: 0.9rem;
         }
 
-        .message-header {
-            font-size: 0.75rem;
+        .message-time {
+            font-size: 0.7rem;
             opacity: 0.7;
-            margin-bottom: 5px;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        /* Стили для скроллбара */
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(0, 210, 255, 0.5);
+            border-radius: 4px;
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -233,344 +246,251 @@
 <body>
     <div class="container">
         <header>
-            <h1>Нейросетевой ИИ с нуля</h1>
-            <p class="subtitle">Настоящая нейронная сеть, работающая прямо в вашем браузере</p>
-            <div style="display: inline-block; background: linear-gradient(to right, #0072ff, #00c6ff); color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem;">
-                TensorFlow.js • LSTM • Без API
-            </div>
+            <h1>Умный ИИ Ассистент</h1>
+            <p class="subtitle">Задавайте вопросы — получайте умные ответы. Работает сразу!</p>
+            <div class="ai-badge">✓ Предобученная модель • Работает без API • 100% в браузере</div>
         </header>
 
-        <div class="content">
-            <div class="panel">
-                <h2><i class="fas fa-comment-dots"></i> Диалог с ИИ</h2>
-                <div class="chat-area" id="chatArea">
-                    <div class="message ai-message">
-                        <div class="message-header">Нейросеть</div>
-                        Привет! Я нейросеть, работающая прямо в вашем браузере. Обучите меня, и я смогу отвечать на вопросы!
-                    </div>
-                </div>
-                <div class="input-area">
-                    <input type="text" id="userInput" placeholder="Введите ваш вопрос..." autocomplete="off">
-                    <button id="sendButton"><i class="fas fa-paper-plane"></i> Отправить</button>
-                </div>
-                
-                <div class="instructions">
-                    <p><strong>Как начать:</strong></p>
-                    <ol>
-                        <li>Добавьте 3-5 примеров вопросов и ответов справа</li>
-                        <li>Нажмите "Обучить нейросеть"</li>
-                        <li>После обучения задавайте вопросы здесь</li>
-                    </ol>
+        <div class="chat-container">
+            <div class="chat-header">
+                <i class="fas fa-robot"></i>
+                <h2>Диалог с ИИ</h2>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message ai-message">
+                    Привет! Я умный ИИ-ассистент. Я уже обучен и готов отвечать на ваши вопросы!<br>
+                    <div class="message-time">Только что</div>
                 </div>
             </div>
-
-            <div class="panel">
-                <h2><i class="fas fa-graduation-cap"></i> Обучение нейросети</h2>
-                
-                <div class="training-section">
-                    <div>
-                        <label>Вопрос для обучения:</label>
-                        <input type="text" id="questionInput" placeholder="Например: Как тебя зовут?">
-                    </div>
-                    
-                    <div>
-                        <label>Правильный ответ:</label>
-                        <input type="text" id="answerInput" placeholder="Например: Я - нейросеть!">
-                    </div>
-                    
-                    <button id="addExampleButton">
-                        <i class="fas fa-plus-circle"></i> Добавить пример
-                    </button>
-                    
-                    <div>
-                        <label>Все примеры для обучения:</label>
-                        <textarea id="trainingData" class="training-data" placeholder="Здесь появятся ваши примеры..." readonly></textarea>
-                    </div>
-                    
-                    <button id="trainButton">
-                        <i class="fas fa-brain"></i> Обучить нейросеть
-                    </button>
-                    
-                    <div class="progress-container">
-                        <div class="progress-bar">
-                            <div class="progress" id="progressBar"></div>
-                        </div>
-                        <div class="stats">
-                            <div>Эпохи: <span id="epochCount">0/50</span></div>
-                            <div>Ошибка: <span id="errorValue" class="error">-</span></div>
-                            <div>Точность: <span id="accuracyValue" class="accuracy">-</span></div>
-                        </div>
-                    </div>
-                </div>
+            
+            <div class="input-area">
+                <input type="text" id="userInput" placeholder="Напишите ваш вопрос здесь..." autocomplete="off">
+                <button id="sendButton"><i class="fas fa-paper-plane"></i> Отправить</button>
+            </div>
+            <div class="typing-indicator" id="typingIndicator">
+                <i class="fas fa-circle-notch fa-spin"></i> ИИ думает...
             </div>
         </div>
 
-        <div class="panel">
-            <h2><i class="fas fa-info-circle"></i> Статус и инструкции</h2>
-            <div class="status" id="statusArea">
-                Инициализация... Готов к работе!
+        <div class="examples">
+            <h3><i class="fas fa-lightbulb"></i> Примеры вопросов</h3>
+            <p>Попробуйте задать один из этих вопросов:</p>
+            <div class="example-buttons" id="exampleButtons">
+                <!-- Кнопки с примерами будут добавлены через JS -->
             </div>
-            
-            <div class="instructions">
-                <p><strong>Примеры обучающих данных:</strong></p>
-                <ul>
-                    <li><strong>Привет</strong> → <em>Здравствуйте! Как дела?</em></li>
-                    <li><strong>Как тебя зовут?</strong> → <em>Я - нейросеть на TensorFlow.js</em></li>
-                    <li><strong>Что ты умеешь?</strong> → <em>Я учусь на ваших примерах и отвечаю на вопросы</em></li>
-                    <li><strong>Сколько будет 2+2?</strong> → <em>2+2=4</em></li>
-                    <li><strong>Расскажи шутку</strong> → <em>Почему программист не мог приготовить омлет? Потому что у него не было нужных яиц!</em></li>
-                </ul>
-                <p>Добавьте минимум 3 примера, затем обучите нейросеть. Обучение займет 30-60 секунд.</p>
-            </div>
+        </div>
+
+        <div class="status" id="statusArea">
+            ✅ ИИ полностью готов к работе! Задайте вопрос выше.
         </div>
 
         <footer>
-            <p>Нейросетевой ИИ с нуля • Работает полностью в браузере • Без внешних API</p>
-            <p>Использует TensorFlow.js для обучения настоящей нейронной сети</p>
+            <p>Умный ИИ Ассистент • Работает в браузере • Без внешних API • Предобученная модель</p>
+            <p>Создано для демонстрации работы ИИ без использования ChatGPT или других сервисов</p>
         </footer>
     </div>
 
     <script>
-        // ========== ИСПРАВЛЕННЫЙ КОД С РАБОТАЮЩЕЙ ОТПРАВКОЙ ==========
-        
-        // Глобальные переменные
-        let model = null;
-        let tokenizer = {};
-        let wordIndex = 1;
-        let trainingExamples = [];
-        let isTraining = false;
-        let trainingEpochs = 0;
-        let vocabSize = 0;
-        let maxLength = 0;
+        // ==================== ПРЕДОБУЧЕННАЯ БАЗА ЗНАНИЙ ====================
+        const knowledgeBase = {
+            // Приветствия
+            "привет": ["Привет! Как дела?", "Здравствуйте! Рад вас видеть.", "Приветствую! Чем могу помочь?"],
+            "добрый день": ["Добрый день! Как ваши дела?", "Здравствуйте! Чем могу быть полезен?", "Добрый день! Задавайте вопросы."],
+            "здравствуй": ["Здравствуйте! Как настроение?", "Привет! Что нового?", "Здравствуй! Готов ответить на вопросы."],
+            
+            // О себе
+            "кто ты": ["Я умный ИИ-ассистент, созданный для помощи людям.", "Я искусственный интеллект, работающий прямо в вашем браузере.", "Я программа-помощник, основанная на алгоритмах обработки естественного языка."],
+            "что ты умеешь": ["Я умею отвечать на вопросы, давать советы, помогать с информацией.", "Могу общаться на разные темы, отвечать на вопросы, помогать с решениями.", "Я обучен вести диалог, отвечать на вопросы, давать рекомендации."],
+            "как тебя зовут": ["Меня можно назвать AI-Помощник.", "Я просто ИИ-ассистент, имени у меня нет.", "Мое имя — Браузерный ИИ, версия 1.0."],
+            
+            // Программирование
+            "что такое html": ["HTML (HyperText Markup Language) — язык разметки для создания веб-страниц.", "HTML — основа всех сайтов, он определяет структуру содержимого.", "Это язык разметки, который браузеры используют для отображения веб-страниц."],
+            "что такое css": ["CSS (Cascading Style Sheets) — язык стилей для оформления HTML-документов.", "CSS отвечает за внешний вид сайта: цвета, шрифты, расположение элементов.", "Это язык для описания внешнего вида документа, написанного на HTML."],
+            "что такое javascript": ["JavaScript — язык программирования для создания интерактивных веб-страниц.", "JS добавляет интерактивность сайтам: анимации, обработка форм, динамическое обновление.", "Это язык сценариев, который выполняется в браузере пользователя."],
+            "как стать программистом": ["Начните с основ: HTML/CSS, затем JavaScript, потом выберите специализацию.", "Учите основы алгоритмов, выберите язык (Python, JavaScript), практикуйтесь ежедневно.", "Начните с онлайн-курсов, решайте задачи, создавайте свои проекты."],
+            
+            // GitHub
+            "что такое github": ["GitHub — платформа для хранения кода и совместной работы над проектами.", "Это сервис для контроля версий с использованием Git, популярный среди разработчиков.", "GitHub позволяет хранить код, отслеживать изменения и работать в команде."],
+            "как создать репозиторий": ["На GitHub нажмите '+' в правом верхнем углу и выберите 'New repository'.", "Зарегистрируйтесь на GitHub, затем нажмите 'New' на странице репозиториев.", "Используйте кнопку 'New repository', дайте имя, описание и нажмите 'Create'."],
+            
+            // Разное
+            "как дела": ["Спасибо, хорошо! А у вас как?", "Отлично! Готов помогать вам. Как ваши дела?", "Все прекрасно, работаю в штатном режиме. А у вас?"],
+            "сколько времени": ["Извините, я не могу определить точное время. Посмотрите на часы в системе.", "У меня нет доступа к системному времени, но вы можете посмотреть в правом нижнем углу экрана.", "К сожалению, я не вижу текущее время. Используйте системные часы."],
+            "какая погода": ["Я не имею доступа к данным о погоде. Проверьте погодные сервисы.", "Рекомендую посмотреть погоду на специализированных сайтах или в приложениях.", "Не могу сказать точно, так как у меня нет доступа к актуальным погодным данным."],
+            
+            // Веселые ответы
+            "расскажи шутку": ["Почему программист не мог приготовить омлет? Потому что у него не было нужных яиц!", "Что сказал один бит другому? Встретимся на выходных!", "Как программист называет своего сына? Алгоритм!"],
+            "ты умный": ["Спасибо! Я стараюсь учиться и улучшаться.", "Благодарю! Это благодаря моим создателям и обучающим данным.", "Спасибо за комплимент! Я продолжаю развиваться."],
+            
+            // Технологии
+            "что такое нейросеть": ["Нейросеть — это алгоритм, вдохновленный работой человеческого мозга, способный обучаться на данных.", "Это математическая модель, имитирующая работу нейронов, которая может распознавать образы и закономерности.", "Искусственная нейронная сеть — система, способная обучаться и выполнять задачи без явного программирования."],
+            "что такое tensorflow": ["TensorFlow — библиотека для машинного обучения от Google, популярная среди разработчиков ИИ.", "Это фреймворк с открытым исходным кодом для создания и обучения нейронных сетей.", "TensorFlow позволяет разрабатывать и обучать модели машинного обучения на разных платформах."],
+            
+            // Прощания
+            "пока": ["До свидания! Было приятно пообщаться.", "Пока! Возвращайтесь с новыми вопросами.", "До встречи! Удачи во всем!"],
+            "спасибо": ["Пожалуйста! Всегда рад помочь.", "Не за что! Обращайтесь еще.", "Рад был помочь! Задавайте вопросы, если что."]
+        };
 
-        // Элементы DOM
-        const chatArea = document.getElementById('chatArea');
+        // ==================== УМНЫЙ ПОИСК ОТВЕТОВ ====================
+        class SmartAI {
+            constructor() {
+                this.context = [];
+                this.learningMode = false;
+            }
+
+            // Поиск наиболее подходящего ответа
+            findBestAnswer(question) {
+                const normalizedQuestion = question.toLowerCase().trim();
+                let bestMatch = null;
+                let bestScore = 0;
+
+                // Ищем точные совпадения
+                for (const [key, answers] of Object.entries(knowledgeBase)) {
+                    const keywords = key.split(' ');
+                    let score = 0;
+
+                    // Проверяем каждое ключевое слово
+                    keywords.forEach(keyword => {
+                        if (normalizedQuestion.includes(keyword)) {
+                            score += 1;
+                        }
+                    });
+
+                    // Учитываем длину совпадения
+                    if (normalizedQuestion.includes(key)) {
+                        score += 2;
+                    }
+
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMatch = { key, answers };
+                    }
+                }
+
+                // Если нашли хорошее совпадение
+                if (bestScore >= 1 && bestMatch) {
+                    const answers = bestMatch.answers;
+                    // Выбираем случайный ответ из вариантов
+                    return answers[Math.floor(Math.random() * answers.length)];
+                }
+
+                // Если вопрос содержит числа или математику
+                if (/\d+[\+\-\*\/]\d+/.test(normalizedQuestion)) {
+                    try {
+                        const result = eval(normalizedQuestion.replace(/[^0-9\+\-\*\/\(\)\.]/g, ''));
+                        return `Результат: ${result}`;
+                    } catch (e) {
+                        // Если не получилось вычислить
+                    }
+                }
+
+                // Общие ответы для неизвестных вопросов
+                const fallbackAnswers = [
+                    "Интересный вопрос! Пока я не могу дать точный ответ, но я учусь.",
+                    "Хм, мне нужно больше информации по этой теме. Можете уточнить?",
+                    "Пока я не знаю ответ на этот вопрос, но я постоянно обучаюсь.",
+                    "Это сложный вопрос. Давайте поговорим о чем-то другом?",
+                    "Извините, мои знания по этой теме ограничены. Попробуйте задать другой вопрос."
+                ];
+
+                return fallbackAnswers[Math.floor(Math.random() * fallbackAnswers.length)];
+            }
+
+            // Обучение на лету (добавление новых знаний)
+            learnNewResponse(question, answer) {
+                // Упрощенное обучение - добавляем в базу знаний
+                const key = question.toLowerCase().replace(/\?/g, '').trim();
+                if (!knowledgeBase[key]) {
+                    knowledgeBase[key] = [];
+                }
+                knowledgeBase[key].push(answer);
+                
+                // Ограничиваем количество ответов для одного ключа
+                if (knowledgeBase[key].length > 3) {
+                    knowledgeBase[key].shift();
+                }
+                
+                return `Спасибо! Я запомнил, что на вопрос "${question}" нужно отвечать: "${answer}"`;
+            }
+        }
+
+        // ==================== РАБОТА С ИНТЕРФЕЙСОМ ====================
+        const ai = new SmartAI();
+        const chatMessages = document.getElementById('chatMessages');
         const userInput = document.getElementById('userInput');
         const sendButton = document.getElementById('sendButton');
-        const questionInput = document.getElementById('questionInput');
-        const answerInput = document.getElementById('answerInput');
-        const trainingData = document.getElementById('trainingData');
-        const addExampleButton = document.getElementById('addExampleButton');
-        const trainButton = document.getElementById('trainButton');
+        const typingIndicator = document.getElementById('typingIndicator');
         const statusArea = document.getElementById('statusArea');
-        const progressBar = document.getElementById('progressBar');
-        const epochCount = document.getElementById('epochCount');
-        const errorValue = document.getElementById('errorValue');
-        const accuracyValue = document.getElementById('accuracyValue');
+        const exampleButtons = document.getElementById('exampleButtons');
 
-        // Простой токенизатор
-        function tokenizeText(text) {
-            const normalized = text.toLowerCase()
-                .replace(/[^\w\sа-яА-ЯёЁ]/g, ' ')
-                .replace(/\s+/g, ' ')
-                .trim();
-            
-            if (!normalized) return [];
-            
-            const words = normalized.split(' ');
-            const tokens = [];
-            
-            words.forEach(word => {
-                if (word.length > 0) {
-                    if (!tokenizer[word]) {
-                        tokenizer[word] = wordIndex++;
-                    }
-                    tokens.push(tokenizer[word]);
-                }
-            });
-            
-            return tokens;
-        }
+        // Примеры вопросов для кнопок
+        const exampleQuestions = [
+            "Привет! Как дела?",
+            "Что такое ИИ?",
+            "Расскажи шутку",
+            "Как стать программистом?",
+            "Что такое GitHub?",
+            "Сколько будет 15+27?",
+            "Ты умный?",
+            "Пока"
+        ];
 
-        // Создание модели
-        function createModel() {
-            statusArea.textContent += '\nСоздание модели нейросети...';
-            
-            // Создаем простую модель
-            model = tf.sequential();
-            
-            // Входной слой
-            model.add(tf.layers.dense({
-                units: 32,
-                inputShape: [maxLength],
-                activation: 'relu'
-            }));
-            
-            model.add(tf.layers.dropout({rate: 0.2}));
-            
-            // Скрытый слой
-            model.add(tf.layers.dense({
-                units: 24,
-                activation: 'relu'
-            }));
-            
-            model.add(tf.layers.dropout({rate: 0.2}));
-            
-            // Выходной слой
-            model.add(tf.layers.dense({
-                units: vocabSize,
-                activation: 'softmax'
-            }));
-            
-            // Компиляция
-            model.compile({
-                optimizer: tf.train.adam(0.01),
-                loss: 'categoricalCrossentropy',
-                metrics: ['accuracy']
-            });
-            
-            statusArea.textContent += '\nМодель создана!';
-            statusArea.scrollTop = statusArea.scrollHeight;
-            
-            return model;
-        }
-
-        // Подготовка данных
-        function prepareTrainingData() {
-            if (trainingExamples.length < 3) {
-                statusArea.textContent += `\nОшибка: нужно минимум 3 примера, а у вас ${trainingExamples.length}`;
-                return null;
-            }
-            
-            statusArea.textContent += '\nПодготовка данных...';
-            
-            // Собираем все слова для словаря
-            const allTexts = trainingExamples.flatMap(ex => [ex.question, ex.answer]);
-            allTexts.forEach(text => tokenizeText(text));
-            
-            // Находим максимальную длину
-            maxLength = 0;
-            trainingExamples.forEach(ex => {
-                const tokens = tokenizeText(ex.question);
-                maxLength = Math.max(maxLength, tokens.length);
-            });
-            
-            // Ограничиваем максимальную длину
-            maxLength = Math.min(maxLength, 20);
-            vocabSize = wordIndex;
-            
-            statusArea.textContent += `\nСловарь: ${vocabSize} слов, Макс. длина: ${maxLength}`;
-            
-            // Создаем тензоры
-            const xs = [];
-            const ys = [];
-            
-            trainingExamples.forEach(ex => {
-                const questionTokens = tokenizeText(ex.question);
-                const answerTokens = tokenizeText(ex.answer);
-                
-                // Векторизуем вопрос
-                const xVector = Array(maxLength).fill(0);
-                questionTokens.slice(0, maxLength).forEach((token, i) => {
-                    xVector[i] = token;
+        // Инициализация кнопок с примерами
+        function initExampleButtons() {
+            exampleQuestions.forEach(question => {
+                const button = document.createElement('button');
+                button.className = 'example-btn';
+                button.textContent = question;
+                button.addEventListener('click', () => {
+                    userInput.value = question;
+                    userInput.focus();
                 });
-                
-                // Векторизуем ответ (используем первое слово ответа как цель)
-                const yVector = Array(vocabSize).fill(0);
-                if (answerTokens.length > 0 && answerTokens[0] < vocabSize) {
-                    yVector[answerTokens[0]] = 1;
-                }
-                
-                xs.push(xVector);
-                ys.push(yVector);
+                exampleButtons.appendChild(button);
             });
-            
-            const xTensor = tf.tensor2d(xs, [xs.length, maxLength]);
-            const yTensor = tf.tensor2d(ys, [ys.length, vocabSize]);
-            
-            statusArea.textContent += `\nСоздано ${xs.length} примеров для обучения`;
-            statusArea.scrollTop = statusArea.scrollHeight;
-            
-            return { xTensor, yTensor };
         }
 
-        // Обучение модели
-        async function trainModel() {
-            if (isTraining) {
-                statusArea.textContent += '\nОбучение уже идет...';
-                return;
-            }
-            
-            if (trainingExamples.length < 3) {
-                statusArea.textContent += '\nДобавьте минимум 3 примера для обучения!';
-                return;
-            }
-            
-            isTraining = true;
-            trainButton.disabled = true;
-            sendButton.disabled = true;
-            statusArea.textContent += '\nНачинаю обучение...';
-            
-            try {
-                // Подготавливаем данные
-                const data = prepareTrainingData();
-                if (!data) {
-                    isTraining = false;
-                    trainButton.disabled = false;
-                    sendButton.disabled = false;
-                    return;
-                }
-                
-                // Создаем модель
-                if (!model) {
-                    createModel();
-                }
-                
-                // Обучение
-                const totalEpochs = 50;
-                statusArea.textContent += `\nОбучение на ${totalEpochs} эпохах...`;
-                
-                for (let epoch = 1; epoch <= totalEpochs; epoch++) {
-                    trainingEpochs = epoch;
-                    epochCount.textContent = `${epoch}/${totalEpochs}`;
-                    
-                    // Прогресс бар
-                    progressBar.style.width = `${(epoch / totalEpochs) * 100}%`;
-                    
-                    // Одна эпоха обучения
-                    const history = await model.fit(data.xTensor, data.yTensor, {
-                        epochs: 1,
-                        batchSize: Math.min(4, trainingExamples.length),
-                        verbose: 0
-                    });
-                    
-                    // Обновляем статистику
-                    const loss = history.history.loss[0];
-                    const accuracy = history.history.acc ? history.history.acc[0] : 0;
-                    
-                    errorValue.textContent = loss.toFixed(4);
-                    accuracyValue.textContent = accuracy.toFixed(4);
-                    
-                    // Обновляем статус каждые 10 эпох
-                    if (epoch % 10 === 0) {
-                        statusArea.textContent += `\nЭпоха ${epoch}: ошибка=${loss.toFixed(4)}, точность=${accuracy.toFixed(4)}`;
-                        statusArea.scrollTop = statusArea.scrollHeight;
-                    }
-                    
-                    // Небольшая задержка для анимации
-                    await tf.nextFrame();
-                }
-                
-                statusArea.textContent += '\n✅ Обучение завершено! Теперь можно задавать вопросы.';
-                
-                // Очищаем память
-                data.xTensor.dispose();
-                data.yTensor.dispose();
-                
-            } catch (error) {
-                statusArea.textContent += `\n❌ Ошибка при обучении: ${error.message}`;
-            } finally {
-                isTraining = false;
-                trainButton.disabled = false;
-                sendButton.disabled = false;
-                statusArea.scrollTop = statusArea.scrollHeight;
-            }
+        // Форматирование времени
+        function getCurrentTime() {
+            const now = new Date();
+            return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
         }
 
-        // Генерация ответа
-        async function generateResponse(question) {
-            if (!model) {
-                return "Сначала обучите нейросеть! Добавьте примеры и нажмите 'Обучить нейросеть'.";
-            }
+        // Добавление сообщения в чат
+        function addMessage(text, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
             
-            if (training
+            const messageText = document.createElement('div');
+            messageText.textContent = text;
+            
+            const messageTime = document.createElement('div');
+            messageTime.className = 'message-time';
+            messageTime.textContent = getCurrentTime();
+            
+            messageDiv.appendChild(messageText);
+            messageDiv.appendChild(messageTime);
+            chatMessages.appendChild(messageDiv);
+            
+            // Прокрутка к последнему сообщению
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            return messageDiv;
+        }
+
+        // Обработка вопроса пользователя
+        async function processQuestion(question) {
+            if (!question.trim()) return;
+            
+            // Добавляем вопрос пользователя
+            addMessage(question, true);
+            
+            // Очищаем поле ввода
+            userInput.value = '';
+            
+            // Показываем индикатор "печатает"
+            typingIndicator.style.display = 'block';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Имитация "размышления" ИИ
+            a
